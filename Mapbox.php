@@ -280,10 +280,6 @@ final class Mapbox extends AbstractHttpProvider implements Provider
 
         $results = [];
         foreach ($json['features'] as $result) {
-            if (!array_key_exists('context', $result)) {
-                break;
-            }
-
             $builder = new AddressBuilder($this->getName());
             $this->parseCoordinates($builder, $result);
 
@@ -298,8 +294,10 @@ final class Mapbox extends AbstractHttpProvider implements Provider
             }
 
             // update address components
-            foreach ($result['context'] as $component) {
-                $this->updateAddressComponent($builder, $component['id'], $component);
+            if (isset($result['context']) && is_array($result['context'])) {
+                foreach ($result['context'] as $component) {
+                    $this->updateAddressComponent($builder, $component['id'], $component);
+                }
             }
 
             /** @var MapboxAddress $address */
